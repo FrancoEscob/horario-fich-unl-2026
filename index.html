@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Horario FICH - 1er Cuatrimestre 2026</title>
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --surface: #ffffff;
+    --surface-soft: #f8faff;
+    --text: #1b2432;
+    --muted: #6b7280;
+    --primary: #2a6ef5;
+    --border: #dde5f2;
+    --danger: #d64355;
+    --danger-soft: #fff1f3;
+    --shadow: 0 10px 30px rgba(33, 64, 119, 0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at top, #f8fbff, #f3f7fc 45%, #eef3fa 100%);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  header {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  header h1 { font-size: 1.02rem; color: #1f3f77; font-weight: 700; }
+  header span { font-size: 0.78rem; color: var(--muted); }
+
+  .career-bar {
+    background: rgba(255, 255, 255, 0.88);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 20px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .career-bar label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-right: 4px; }
+  .career-btn {
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: #52607a;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .career-btn:hover { border-color: #b8cdf6; color: #1f4ea8; }
+  .career-btn.active { border-color: var(--career-color); background: var(--career-color); color: #fff; box-shadow: 0 6px 16px color-mix(in srgb, var(--career-color) 35%, transparent); }
+  .career-btn.ia { --career-color: #6c63ff; }
+  .career-btn.info { --career-color: #1f9d88; }
+
+  .conflict-bar {
+    background: var(--danger-soft);
+    border-bottom: 1px solid #f5c3cb;
+    padding: 8px 20px;
+    font-size: 0.78rem;
+    color: #9f2434;
+    display: none;
+    align-items: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .conflict-bar.visible { display: flex; }
+  .conflict-bar ul { list-style: none; display: flex; flex-wrap: wrap; gap: 5px; }
+  .conflict-bar ul li { background: #fff; border: 1px solid #f0b2bb; border-radius: 999px; padding: 3px 8px; font-size: 0.68rem; color: #a13242; }
+
+  .main { display: flex; flex: 1; }
+
+  .sidebar {
+    width: 286px;
+    min-width: 286px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 12px 8px;
+    overflow-y: auto;
+    max-height: calc(100vh - 106px);
+  }
+  .sidebar h2 { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; padding: 0 4px; }
+
+  .subject-block { margin-bottom: 10px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(71, 98, 147, 0.06); }
+  .subject-header { padding: 8px 10px; font-size: 0.8rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+  .subject-code { font-size: 0.62rem; opacity: 0.8; font-weight: 500; }
+
+  .commission-item { background: #fff; padding: 6px 10px; border-top: 1px solid #eef2f9; cursor: pointer; transition: all 0.15s; }
+  .commission-item:hover { background: #f7faff; }
+  .commission-item.conflicted { background: repeating-linear-gradient(45deg,#fff1f3,#fff1f3 4px,#ffeaee 4px,#ffeaee 8px) !important; border-left: 3px solid var(--danger); }
+
+  .comm-label { font-size: 0.77rem; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+  .comm-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+  .comm-warn { color: var(--danger); font-size: 9px; display: none; }
+  .comm-check { width: 14px; height: 14px; border-radius: 4px; border: 2px solid currentColor; display: flex; align-items: center; justify-content: center; margin-left: auto; flex-shrink: 0; font-size: 9px; }
+  .comm-sessions { font-size: 0.66rem; color: #5f6c83; margin-top: 2px; padding-left: 12px; line-height: 1.35; }
+
+  .quick-btns { padding: 8px; background: var(--surface-soft); border-top: 1px solid var(--border); }
+  .quick-btns p { font-size: 0.67rem; color: var(--muted); margin-bottom: 6px; }
+  .btn-row { display: flex; gap: 5px; flex-wrap: wrap; }
+  .qbtn { font-size: 0.68rem; padding: 5px 9px; border: 1px solid var(--border); border-radius: 999px; cursor: pointer; background: #fff; color: #4f5d78; transition: all 0.15s; }
+  .qbtn:hover { border-color: #b8cdf6; color: #234f9f; }
+
+  .action-btns { padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+  .abtn { padding: 9px; border: none; border-radius: 10px; cursor: pointer; font-size: 0.76rem; font-weight: 700; transition: all 0.15s; }
+  .abtn.reset { background: #fff4f5; color: #bc3040; border: 1px solid #f5c3cb; }
+  .abtn.reset:hover { background: #ffe9ec; }
+  .abtn.pdf { background: #eaf1ff; color: #1f4ea8; border: 1px solid #bfd3ff; }
+  .abtn.pdf:hover { background: #dce8ff; }
+
+  .calendar-area { flex: 1; overflow-x: auto; overflow-y: auto; padding: 14px; max-height: calc(100vh - 106px); }
+  .cal-wrap { display: flex; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; min-width: 680px; box-shadow: var(--shadow); background: var(--surface); }
+
+  .time-col { width: 52px; flex-shrink: 0; border-right: 1px solid var(--border); background: #f9fbff; }
+  .time-col .col-hdr { height: 32px; border-bottom: 1px solid var(--border); }
+  .time-body { position: relative; }
+  .time-label { position: absolute; left: 0; width: 100%; text-align: right; padding-right: 6px; font-size: 8px; color: #7c8ca8; padding-top: 2px; }
+
+  .day-col { flex: 1; border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+  .day-col:last-child { border-right: none; }
+  .col-hdr { height: 32px; background: #f8fbff; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.74rem; font-weight: 700; color: #5f6c83; flex-shrink: 0; }
+  .day-body { position: relative; background: #fff; }
+  .grid-line { position: absolute; left: 0; right: 0; pointer-events: none; }
+
+  .cal-event { position: absolute; border-radius: 8px; padding: 3px 5px; font-size: 0.6rem; cursor: pointer; overflow: hidden; border-left: 3px solid transparent; transition: filter 0.15s, box-shadow 0.15s; z-index: 2; }
+  .cal-event:hover { filter: brightness(1.05); box-shadow: 0 6px 12px rgba(31, 78, 168, 0.18); z-index: 20; }
+  .cal-event .ev-name { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.62rem; }
+  .cal-event .ev-sub { opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.58rem; }
+  .cal-event .ev-t { opacity: 0.8; font-size: 0.58rem; }
+  .cal-event.conflict { border: 2px solid var(--danger) !important; box-shadow: 0 0 0 3px rgba(214, 67, 85, 0.18); }
+  .cal-event.conflict::after { content: '⚠'; position: absolute; top: 1px; right: 3px; font-size: 9px; color: var(--danger); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 4px; font-size: 0.7rem; color: #5f6c83; background: #fff; border: 1px solid var(--border); border-radius: 999px; padding: 4px 8px; }
+  .legend-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+
+  .hamburger { display: none; background: none; border: none; cursor: pointer; padding: 6px; color: #1f4ea8; font-size: 1.3rem; line-height: 1; }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(16, 23, 35, 0.35); z-index: 99; }
+  .sidebar-overlay.open { display: block; }
+  .sidebar-close { display: none; }
+
+  @media print {
+    body { background: #fff; }
+    .sidebar, .career-bar, .action-btns, .conflict-bar, .hamburger { display: none !important; }
+    .main { display: block; }
+    .calendar-area { max-height: none; overflow: visible; padding: 0; }
+    .cal-wrap, .day-body, .time-col { border-color: #cdd5e4; box-shadow: none; }
+    .col-hdr { background: #f4f7fb; color: #2e3748; }
+  }
+
+  @media (max-width: 768px) {
+    header { padding: 10px 14px; }
+    header h1 { font-size: 0.85rem; }
+    .hamburger { display: flex; align-items: center; justify-content: center; margin-right: 6px; }
+
+    .career-bar { padding: 8px 12px; gap: 6px; overflow-x: auto; flex-wrap: nowrap; -webkit-overflow-scrolling: touch; }
+    .career-bar label { display: none; }
+    .career-btn { font-size: 0.72rem; padding: 6px 11px; white-space: nowrap; flex-shrink: 0; }
+
+    .conflict-bar { padding: 6px 12px; font-size: 0.72rem; }
+
+    .main { flex-direction: column; }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 88vw;
+      max-width: 328px;
+      min-width: unset;
+      z-index: 100;
+      transform: translateX(-110%);
+      transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+      max-height: 100vh;
+      border-right: 1px solid var(--border);
+      padding-top: 0;
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    .sidebar-header-mobile {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 12px 8px 12px;
+      border-bottom: 1px solid var(--border);
+      background: #f8fbff;
+      flex-shrink: 0;
+    }
+    .sidebar-header-mobile span { font-size: 0.8rem; font-weight: 700; color: #1f4ea8; }
+    .sidebar-close { display: flex; background: none; border: none; color: #60718f; font-size: 1.3rem; cursor: pointer; padding: 4px; }
+
+    .calendar-area { max-height: none; padding: 10px 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
+    .cal-wrap { min-width: 520px; }
+    .qbtn { font-size: 0.72rem; padding: 6px 10px; }
+    .abtn { padding: 10px; font-size: 0.8rem; }
+    .commission-item { padding: 8px 10px; }
+    .comm-label { font-size: 0.8rem; }
+    .comm-sessions { font-size: 0.67rem; }
+    .comm-check { width: 16px; height: 16px; font-size: 10px; }
+  }
+
+  @media (max-width: 420px) {
+    .cal-wrap { min-width: 460px; }
+    header h1 { font-size: 0.78rem; max-width: 220px; line-height: 1.3; }
+  }
+
+</style>
+</head>
+<body>
+
+<header>
+  <button class="hamburger" onclick="toggleSidebar()" aria-label="Abrir materias">☰</button>
+  <h1>Planificador de Horario — FICH UNL · 1er Cuatrimestre 2026</h1>
+  <span id="selectedCount">0 comisiones seleccionadas</span>
+</header>
+
+<div class="career-bar">
+  <label>Carrera:</label>
+  <button class="career-btn ia active" id="btn_ia" onclick="switchCareer('ia')">Ing. en Inteligencia Artificial</button>
+  <button class="career-btn info" id="btn_info" onclick="switchCareer('info')">Ing. en Informática</button>
+</div>
+
+<div class="conflict-bar" id="conflictBar">
+  <span>⚠️</span><strong>Superposición:</strong>
+  <ul id="conflictList"></ul>
+</div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-header-mobile"><span>Materias</span><button class="sidebar-close" onclick="toggleSidebar()">✕</button></div>
+    <h2 id="sidebarTitle">Materias</h2>
+    <div id="subjectList"></div>
+    <div class="quick-btns">
+      <p>Cargar combinación rápida</p>
+      <div class="btn-row" id="quickBtns"></div>
+    </div>
+    <div class="action-btns">
+      <button class="abtn reset" onclick="resetAll()">Resetear todo</button>
+      <button class="abtn pdf" onclick="downloadPdf()">Descargar PDF</button>
+    </div>
+  </div>
+
+  <div class="calendar-area">
+    <div class="cal-wrap" id="calWrap"></div>
+    <div class="legend" id="legend"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<script>
+const DAYS = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
+const DAY_IDX = {'Lunes':0,'Martes':1,'Miercoles':2,'Miércoles':2,'Jueves':3,'Viernes':4};
+const S_HOUR = 8, E_HOUR = 21, SLOT_H = 18, SPH = 2;
+const TOTAL_SLOTS = (E_HOUR - S_HOUR) * SPH;
+const TOTAL_PX = TOTAL_SLOTS * SLOT_H;
+
+// ── DATA ──────────────────────────────────────────────
+const SHARED_INGLES = {
+  id:'ingles', name:'Inglés I', code:'FHUCIDEX0', color:'#3ab88a',
+  commissions:[
+    {id:'ing_c1',label:'C1',sessions:[
+      {day:'Lunes',start:'08:00',end:'10:00',type:'T/P',aula:'A determinar',cupo:40},
+      {day:'Miércoles',start:'08:00',end:'10:00',type:'T/P',aula:'A determinar',cupo:40}
+    ]},
+    {id:'ing_c2',label:'C2',sessions:[
+      {day:'Martes',start:'14:00',end:'16:00',type:'T/P',aula:'A determinar',cupo:35},
+      {day:'Viernes',start:'14:00',end:'16:00',type:'T/P',aula:'A determinar',cupo:35}
+    ]}
+  ]
+};
+
+const SHARED_PROG = {
+  id:'prog', name:'Programación', code:'FHUCMAT11', color:'#4a9fe0',
+  commissions:[
+    {id:'pr_c1',label:'C1',sessions:[{day:'Martes',start:'08:00',end:'10:00',type:'Teoría',aula:'Aula Magna A',cupo:40},{day:'Viernes',start:'08:00',end:'12:00',type:'Práctica',aula:'Lab I',cupo:40}]},
+    {id:'pr_c2',label:'C2',sessions:[{day:'Martes',start:'08:00',end:'10:00',type:'Teoría',aula:'A determinar',cupo:40},{day:'Viernes',start:'08:00',end:'12:00',type:'Práctica',aula:'A determinar',cupo:40}]},
+    {id:'pr_c3',label:'C3',sessions:[{day:'Martes',start:'10:00',end:'12:00',type:'Teoría',aula:'Aula Magna A',cupo:40},{day:'Viernes',start:'08:00',end:'12:00',type:'Práctica',aula:'Lab III',cupo:40}]},
+    {id:'pr_c4',label:'C4',sessions:[{day:'Martes',start:'10:00',end:'12:00',type:'Teoría',aula:'A determinar',cupo:40},{day:'Jueves',start:'17:00',end:'21:00',type:'Práctica',aula:'A determinar',cupo:40}]},
+    {id:'pr_c5',label:'C5',sessions:[{day:'Martes',start:'10:00',end:'12:00',type:'Teoría',aula:'A determinar',cupo:40},{day:'Viernes',start:'13:00',end:'17:00',type:'Práctica',aula:'Lab III',cupo:40}]},
+    {id:'pr_c6',label:'C6',sessions:[{day:'Martes',start:'10:00',end:'12:00',type:'Teoría',aula:'A determinar',cupo:40},{day:'Viernes',start:'13:00',end:'17:00',type:'Práctica',aula:'Lab II',cupo:40}]},
+    {id:'pr_c7',label:'C7',sessions:[{day:'Martes',start:'13:00',end:'15:00',type:'Teoría',aula:'Aula Magna A',cupo:40},{day:'Viernes',start:'17:00',end:'21:00',type:'Práctica',aula:'Lab I',cupo:40}]},
+    {id:'pr_c8',label:'C8',sessions:[{day:'Martes',start:'15:30',end:'17:30',type:'Teoría',aula:'Aula Magna A',cupo:40},{day:'Viernes',start:'17:00',end:'21:00',type:'Práctica',aula:'Lab III',cupo:40}]},
+    {id:'pr_rec',label:'Rec.',sessions:[{day:'Miércoles',start:'18:30',end:'20:30',type:'Práctica',aula:'A determinar',cupo:40}]}
+  ]
+};
+
+const CAREERS = {
+  ia: {
+    name: 'Ing. en Inteligencia Artificial',
+    subjects: [
+      {id:'calculo',name:'Cálculo I',code:'FICHIAR01',color:'#e05555',commissions:[
+        {id:'cal_c1',label:'C1',sessions:[{day:'Lunes',start:'18:00',end:'21:00',type:'Teoría',aula:'Aula Magna A',cupo:40},{day:'Jueves',start:'12:00',end:'15:00',type:'Práctica',aula:'A determinar',cupo:40}]},
+        {id:'cal_c2',label:'C2',sessions:[{day:'Lunes',start:'08:00',end:'11:00',type:'Práctica',aula:'A determinar',cupo:100},{day:'Miércoles',start:'17:00',end:'20:00',type:'Teoría',aula:'A determinar',cupo:100}]},
+        {id:'cal_c3',label:'C3',sessions:[{day:'Lunes',start:'18:00',end:'21:00',type:'Teoría',aula:'A determinar',cupo:60},{day:'Miércoles',start:'08:00',end:'11:00',type:'Práctica',aula:'A determinar',cupo:60}]}
+      ]},
+      {id:'algebra',name:'Álgebra I',code:'FICHIAR02',color:'#e08a35',commissions:[
+        {id:'alg_c1',label:'C1',sessions:[{day:'Lunes',start:'15:30',end:'18:00',type:'Teoría',aula:'Aula Magna A',cupo:120},{day:'Lunes',start:'12:00',end:'15:00',type:'Práctica',aula:'Aula Magna A',cupo:120}]},
+        {id:'alg_c2',label:'C2',sessions:[{day:'Jueves',start:'12:00',end:'15:00',type:'Teoría',aula:'Aula Magna A',cupo:120},{day:'Jueves',start:'15:30',end:'18:30',type:'Práctica',aula:'Aula Magna A',cupo:120}]}
+      ]},
+      {id:'ia_sub',name:'Intro. a la IA',code:'FICHIAR04',color:'#8e55e0',commissions:[
+        {id:'ia_c1',label:'Única',sessions:[{day:'Miércoles',start:'13:30',end:'16:30',type:'T/P',aula:'Aula Magna A',cupo:null}]}
+      ]},
+      SHARED_INGLES,
+      SHARED_PROG
+    ]
+  },
+  info: {
+    name: 'Ing. en Informática',
+    subjects: [
+      {id:'quimica',name:'Química General',code:'FICHIF003',color:'#e0c235',commissions:[
+        {id:'qui_c1',label:'C1',sessions:[{day:'Lunes',start:'09:00',end:'11:00',type:'Problemas',aula:'A determinar',cupo:120},{day:'Jueves',start:'19:00',end:'20:30',type:'Teoría',aula:'A determinar',cupo:120}]},
+        {id:'qui_c2',label:'C2',sessions:[{day:'Lunes',start:'09:00',end:'11:00',type:'Problemas',aula:'A determinar',cupo:120},{day:'Jueves',start:'19:00',end:'20:30',type:'Teoría',aula:'A determinar',cupo:120}]},
+        {id:'qui_c3',label:'C3',sessions:[{day:'Lunes',start:'13:00',end:'15:00',type:'Problemas',aula:'Aula 3.1 - FICH',cupo:100},{day:'Jueves',start:'19:00',end:'20:30',type:'Teoría',aula:'A determinar',cupo:100}]}
+      ]},
+      {id:'matbasica',name:'Matemática Básica',code:'FICHIRH01',color:'#e05599',commissions:[
+        {id:'mat_c1',label:'C1',sessions:[{day:'Lunes',start:'18:30',end:'21:30',type:'T/P',aula:'Aula 0.2 - FICH',cupo:50},{day:'Miércoles',start:'18:30',end:'21:30',type:'T/P',aula:'Aula 0.2 - FICH',cupo:50}]},
+        {id:'mat_c2',label:'C2',sessions:[{day:'Lunes',start:'18:00',end:'21:00',type:'T/P',aula:'Aula 0.3 - FICH',cupo:60},{day:'Jueves',start:'08:00',end:'11:00',type:'T/P',aula:'Aula Magna A',cupo:60}]},
+        {id:'mat_c3',label:'C3',sessions:[{day:'Martes',start:'08:30',end:'11:30',type:'T/P',aula:'A determinar',cupo:100},{day:'Viernes',start:'08:30',end:'11:30',type:'T/P',aula:'Aula 3.1 - FICH',cupo:100}]},
+        {id:'mat_c4',label:'C4',sessions:[{day:'Miércoles',start:'09:00',end:'12:00',type:'T/P',aula:'A determinar',cupo:60},{day:'Viernes',start:'09:00',end:'12:00',type:'T/P',aula:'Aula 6 - Cubo',cupo:60}]},
+        {id:'mat_c5',label:'C5',sessions:[{day:'Martes',start:'14:00',end:'17:00',type:'T/P',aula:'Lab Mec. Fluidos',cupo:60},{day:'Jueves',start:'14:00',end:'17:00',type:'T/P',aula:'Aula 7 - Cubo',cupo:60}]},
+        {id:'mat_c6',label:'C6',sessions:[{day:'Martes',start:'08:00',end:'11:00',type:'T/P',aula:'A determinar',cupo:60},{day:'Miércoles',start:'13:00',end:'16:00',type:'T/P',aula:'Aula 4 - Cubo',cupo:60}]}
+      ]},
+      SHARED_INGLES,
+      SHARED_PROG
+    ]
+  }
+};
+
+// ── STATE ──
+let currentCareer = 'ia';
+let selected = new Set();
+let selectionsByCareer = { ia: [], info: [] };
+const STORAGE_ID = 'fich_horario_state_v2';
+
+function toMin(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
+function slotOf(t){ const [h,m]=t.split(':').map(Number); return (h-S_HOUR)*2+(m>=30?1:0); }
+
+function getSubjects(){ return CAREERS[currentCareer].subjects; }
+function getSubjectsFromCareer(c){ return CAREERS[c].subjects; }
+function getSubjectByCommId(cid){ for(const s of getSubjects()) for(const c of s.commissions) if(c.id===cid) return s; return null; }
+function getCommById(cid){ for(const s of getSubjects()) for(const c of s.commissions) if(c.id===cid) return c; return null; }
+function commExistsInCareer(c,cid){ for(const s of getSubjectsFromCareer(c)) for(const comm of s.commissions) if(comm.id===cid) return true; return false; }
+
+function saveState(){
+  selectionsByCareer[currentCareer]=[...selected].filter(cid=>commExistsInCareer(currentCareer,cid));
+  localStorage.setItem(STORAGE_ID, JSON.stringify({ currentCareer, selectionsByCareer }));
+}
+
+function loadState(){
+  try {
+    const raw=localStorage.getItem(STORAGE_ID);
+    if(!raw) return;
+    const parsed=JSON.parse(raw);
+    if(parsed?.selectionsByCareer){
+      for(const c of Object.keys(CAREERS)){
+        const arr=Array.isArray(parsed.selectionsByCareer[c]) ? parsed.selectionsByCareer[c] : [];
+        selectionsByCareer[c]=arr.filter(cid=>commExistsInCareer(c,cid));
+      }
+    }
+    if(parsed?.currentCareer && CAREERS[parsed.currentCareer]) currentCareer=parsed.currentCareer;
+    selected=new Set(selectionsByCareer[currentCareer]||[]);
+  } catch {
+    selectionsByCareer={ ia: [], info: [] };
+  }
+}
+
+function computeConflicts(){
+  const active=[];
+  for(const cid of selected){
+    const s=getSubjectByCommId(cid), c=getCommById(cid);
+    if(!s||!c) continue;
+    c.sessions.forEach((sess,idx)=>active.push({cid,sessIdx:idx,sess,subjName:s.name,commLabel:c.label,conflictId:`${cid}:${idx}`}));
+  }
+  const pairs=[], conflicted=new Set();
+  for(let i=0;i<active.length;i++) for(let j=i+1;j<active.length;j++){
+    const a=active[i],b=active[j];
+    if(DAY_IDX[a.sess.day]!==DAY_IDX[b.sess.day]) continue;
+    if(toMin(a.sess.start)<toMin(b.sess.end)&&toMin(b.sess.start)<toMin(a.sess.end)){
+      pairs.push({a,b}); conflicted.add(a.conflictId); conflicted.add(b.conflictId);
+    }
+  }
+  return {pairs,conflicted};
+}
+
+function getSelectedRows(){
+  const rows=[];
+  for(const cid of selected){
+    const subj=getSubjectByCommId(cid), comm=getCommById(cid);
+    if(!subj||!comm) continue;
+    for(const sess of comm.sessions){
+      rows.push([
+        subj.name,
+        comm.label,
+        sess.day,
+        `${sess.start} - ${sess.end}`,
+        sess.type,
+        sess.aula || 'A determinar'
+      ]);
+    }
+  }
+  return rows.sort((a,b)=>{
+    const dayA=DAY_IDX[a[2]] ?? 99;
+    const dayB=DAY_IDX[b[2]] ?? 99;
+    if(dayA!==dayB) return dayA-dayB;
+    return toMin(a[3].split(' - ')[0])-toMin(b[3].split(' - ')[0]);
+  });
+}
+
+function downloadPdf(){
+  if(selected.size===0){
+    alert('Seleccioná al menos una comisión para generar el PDF.');
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  const rows=getSelectedRows();
+  const {pairs}=computeConflicts();
+  const dateText=new Date().toLocaleDateString('es-AR');
+
+  doc.setFillColor(42,110,245);
+  doc.rect(0,0,595,76,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(16);
+  doc.text('Planificador de Horario — FICH UNL', 38, 34);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(10);
+  doc.text(`Carrera: ${CAREERS[currentCareer].name}`, 38, 54);
+  doc.text(`Generado: ${dateText}`, 420, 54);
+
+  doc.setTextColor(40,49,65);
+  doc.setFontSize(11);
+  doc.setFont('helvetica','bold');
+  doc.text(`Comisiones seleccionadas: ${selected.size}`, 38, 100);
+  doc.text(`Superposiciones detectadas: ${pairs.length}`, 260, 100);
+
+  doc.autoTable({
+    startY: 118,
+    head: [['Materia','Comisión','Día','Horario','Tipo','Aula']],
+    body: rows,
+    theme: 'grid',
+    styles: { fontSize: 9, cellPadding: 6, textColor:[32,43,62], lineColor:[221,229,242], lineWidth:0.6 },
+    headStyles: { fillColor:[42,110,245], textColor:[255,255,255], fontStyle:'bold' },
+    alternateRowStyles: { fillColor:[247,250,255] },
+    margin: { left: 36, right: 36 }
+  });
+
+  if(pairs.length>0){
+    const finalY = (doc.lastAutoTable?.finalY || 140) + 18;
+    doc.setTextColor(159,36,52);
+    doc.setFont('helvetica','bold');
+    doc.text('Aviso de superposiciones', 38, finalY);
+    doc.setTextColor(118,44,56);
+    doc.setFont('helvetica','normal');
+    let y=finalY+14;
+    for(const p of pairs.slice(0,8)){
+      doc.text(`• ${p.a.subjName} ${p.a.commLabel} ↔ ${p.b.subjName} ${p.b.commLabel} (${p.a.sess.day})`, 42, y);
+      y+=12;
+      if(y>790) break;
+    }
+  }
+
+  const fileCareer=currentCareer==='ia'?'ia':'informatica';
+  doc.save(`horario-fich-${fileCareer}.pdf`);
+}
+
+function toggleComm(cid){
+  if(selected.has(cid)){ selected.delete(cid); }
+  else {
+    const subj=getSubjectByCommId(cid);
+    if(subj) for(const c of subj.commissions) if(selected.has(c.id)) selected.delete(c.id);
+    selected.add(cid);
+  }
+  saveState();
+  render();
+}
+
+function switchCareer(c){
+  selectionsByCareer[currentCareer]=[...selected].filter(cid=>commExistsInCareer(currentCareer,cid));
+  currentCareer=c;
+  selected=new Set(selectionsByCareer[c]||[]);
+  document.getElementById('btn_ia').classList.toggle('active',c==='ia');
+  document.getElementById('btn_info').classList.toggle('active',c==='info');
+  buildSidebar();
+  buildLegend();
+  saveState();
+  render();
+}
+
+function resetAll(){ selected.clear(); saveState(); render(); }
+
+function selectQuick(lbl){
+  selected.clear();
+  for(const subj of getSubjects()){
+    const found=subj.commissions.find(c=>c.label===lbl);
+    if(found) selected.add(found.id);
+    else if(subj.commissions.length===1) selected.add(subj.commissions[0].id);
+  }
+  saveState();
+  render();
+}
+
+// ── BUILD SIDEBAR ──
+function buildSidebar(){
+  const container=document.getElementById('subjectList');
+  container.innerHTML='';
+  for(const subj of getSubjects()){
+    const block=document.createElement('div');
+    block.className='subject-block';
+    block.style.borderColor=subj.color+'55';
+    block.innerHTML=`<div class="subject-header" style="background:${subj.color}22;color:${subj.color}"><span>${subj.name}</span><span class="subject-code">${subj.code}</span></div>`;
+    for(const comm of subj.commissions){
+      const item=document.createElement('div');
+      item.className='commission-item';
+      item.id='si_'+comm.id;
+      item.style.color=subj.color;
+      const sessText=comm.sessions.map(s=>`${s.day.substring(0,3)} ${s.start}-${s.end} (${s.type})`).join(' · ');
+      item.innerHTML=`<div class="comm-label"><span class="comm-dot" style="background:${subj.color}"></span><span>${comm.label}</span><span class="comm-warn" id="warn_${comm.id}">⚠ Superposición</span><span class="comm-check" id="chk_${comm.id}" style="border-color:${subj.color}"></span></div><div class="comm-sessions">${sessText}</div>`;
+      item.onclick=()=>toggleComm(comm.id);
+      block.appendChild(item);
+    }
+    container.appendChild(block);
+  }
+  // Quick buttons
+  const qc=document.getElementById('quickBtns');
+  qc.innerHTML='';
+  const labels=[...new Set(getSubjects().flatMap(s=>s.commissions.map(c=>c.label)))].filter(l=>l!=='Única'&&l!=='Rec.').slice(0,8);
+  for(const lbl of labels){
+    const btn=document.createElement('button');
+    btn.className='qbtn'; btn.textContent=`Todas ${lbl}`; btn.onclick=()=>selectQuick(lbl);
+    qc.appendChild(btn);
+  }
+}
+
+function buildLegend(){
+  const legend=document.getElementById('legend');
+  legend.innerHTML='';
+  for(const subj of getSubjects()){
+    const li=document.createElement('div');
+    li.className='legend-item';
+    li.innerHTML=`<span class="legend-dot" style="background:${subj.color}"></span>${subj.name}`;
+    legend.appendChild(li);
+  }
+  const cl=document.createElement('div');
+  cl.className='legend-item';
+  cl.innerHTML=`<span class="legend-dot" style="background:#d64355;border:1px solid #d64355"></span>Superposición`;
+  legend.appendChild(cl);
+}
+
+// ── BUILD CALENDAR GRID ──
+function buildGrid(){
+  const wrap=document.getElementById('calWrap');
+  wrap.innerHTML='';
+
+  // Time column
+  const tc=document.createElement('div');
+  tc.className='time-col';
+  tc.innerHTML=`<div class="col-hdr"></div>`;
+  const tb=document.createElement('div');
+  tb.className='time-body';
+  tb.style.height=TOTAL_PX+'px';
+  for(let s=0;s<TOTAL_SLOTS;s++){
+    const isH=s%2===0, h=S_HOUR+Math.floor(s/2);
+    const lbl=document.createElement('div');
+    lbl.className='time-label';
+    lbl.style.cssText=`top:${s*SLOT_H}px;height:${SLOT_H}px;border-bottom:${isH?'1px solid #dce5f2':'1px dashed #edf2fb'};`;
+    if(isH) lbl.textContent=`${h}:00`;
+    tb.appendChild(lbl);
+  }
+  tc.appendChild(tb);
+  wrap.appendChild(tc);
+
+  // Day columns
+  DAYS.forEach((day,di)=>{
+    const col=document.createElement('div');
+    col.className='day-col';
+    col.innerHTML=`<div class="col-hdr">${day}</div>`;
+    const body=document.createElement('div');
+    body.className='day-body';
+    body.style.height=TOTAL_PX+'px';
+    body.id=`dw_${di}`;
+    for(let s=0;s<TOTAL_SLOTS;s++){
+      const isH=s%2===0;
+      const line=document.createElement('div');
+      line.className='grid-line';
+      line.style.cssText=`top:${s*SLOT_H}px;height:${SLOT_H}px;border-bottom:${isH?'1px solid #dce5f2':'1px dashed #edf2fb'};`;
+      body.appendChild(line);
+    }
+    col.appendChild(body);
+    wrap.appendChild(col);
+  });
+}
+
+// ── RENDER ──
+function render(){
+  document.querySelectorAll('.cal-event').forEach(e=>e.remove());
+  const {pairs,conflicted}=computeConflicts();
+
+  // Build per-day event list for column layout
+  const dayMap={};
+  for(const cid of selected){
+    const subj=getSubjectByCommId(cid), comm=getCommById(cid);
+    if(!subj||!comm) continue;
+    comm.sessions.forEach((sess,idx)=>{
+      const di=DAY_IDX[sess.day];
+      if(di===undefined) return;
+      if(!dayMap[di]) dayMap[di]=[];
+      dayMap[di].push({cid,sessIdx:idx,sess,subj,comm,conflictId:`${cid}:${idx}`});
+    });
+  }
+
+  for(const [di,items] of Object.entries(dayMap)){
+    items.sort((a,b)=>toMin(a.sess.start)-toMin(b.sess.start));
+    // Assign columns
+    const assigned=[];
+    for(const item of items){
+      let col=0;
+      while(true){
+        const same=assigned.filter(x=>x.col===col);
+        const overlap=same.some(x=>toMin(x.sess.start)<toMin(item.sess.end)&&toMin(item.sess.start)<toMin(x.sess.end));
+        if(!overlap) break;
+        col++;
+      }
+      item.col=col; assigned.push(item);
+    }
+    const maxCol=Math.max(...items.map(i=>i.col),0)+1;
+
+    const body=document.getElementById(`dw_${di}`);
+    if(!body) continue;
+
+    for(const item of items){
+      const startS=slotOf(item.sess.start), endS=slotOf(item.sess.end);
+      const h=(endS-startS)*SLOT_H-2;
+      const top=startS*SLOT_H+1;
+      const isConfl=conflicted.has(item.conflictId);
+      const colW=100/maxCol;
+
+      const ev=document.createElement('div');
+      ev.className='cal-event'+(isConfl?' conflict':'');
+      ev.style.cssText=`top:${top}px;height:${h}px;left:calc(${item.col*colW}% + 2px);width:calc(${colW}% - 4px);background:${item.subj.color}22;border-left-color:${item.subj.color};color:${item.subj.color};`;
+      if(isConfl) ev.style.borderColor='#d64355';
+      const showTime=h>=30;
+      ev.innerHTML=`<div class="ev-name">${item.subj.name.split(' ').slice(0,2).join(' ')} ${item.comm.label}</div><div class="ev-sub">${item.sess.type}</div>${showTime?`<div class="ev-t">${item.sess.start}-${item.sess.end}</div>`:''}`;
+      ev.title=`${item.subj.name} · ${item.comm.label}\n${item.sess.day} ${item.sess.start}-${item.sess.end}\n${item.sess.type} · ${item.sess.aula}${item.sess.cupo?' · Cupo: '+item.sess.cupo:''}`;
+      ev.onclick=(e)=>{e.stopPropagation();toggleComm(item.cid);};
+      body.appendChild(ev);
+    }
+  }
+
+  // Conflict bar
+  const bar=document.getElementById('conflictBar');
+  const list=document.getElementById('conflictList');
+  if(pairs.length>0){
+    bar.classList.add('visible');
+    list.innerHTML=pairs.map(p=>`<li>⚠ ${p.a.subjName} ${p.a.commLabel} ↔ ${p.b.subjName} ${p.b.commLabel} · ${DAYS[DAY_IDX[p.a.sess.day]]} ${p.a.sess.start}-${p.a.sess.end} / ${p.b.sess.start}-${p.b.sess.end}</li>`).join('');
+  } else bar.classList.remove('visible');
+
+  // Sidebar state
+  const conflictedComms=new Set([...conflicted].map(k=>k.split(':')[0]));
+  for(const subj of getSubjects()){
+    for(const comm of subj.commissions){
+      const item=document.getElementById('si_'+comm.id);
+      const chk=document.getElementById('chk_'+comm.id);
+      const warn=document.getElementById('warn_'+comm.id);
+      if(!item||!chk) continue;
+      const isSel=selected.has(comm.id);
+      const isConfl=conflictedComms.has(comm.id);
+      item.style.background=isSel?(subj.color+'22'):'';
+      item.classList.toggle('conflicted',isSel&&isConfl);
+      chk.textContent=isSel?'✓':'';
+      chk.style.background=isSel?subj.color:'';
+      chk.style.color=isSel?'#fff':subj.color;
+      if(warn) warn.style.display=(isSel&&isConfl)?'inline':'none';
+    }
+  }
+  const n=selected.size;
+  document.getElementById('selectedCount').textContent=`${n} comisión${n!==1?'es':''} seleccionada${n!==1?'s':''}`;
+}
+
+
+function toggleSidebar(){
+  const sb = document.querySelector('.sidebar');
+  const ov = document.getElementById('sidebarOverlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('open');
+}
+
+// ── INIT ──
+loadState();
+document.getElementById('btn_ia').classList.toggle('active',currentCareer==='ia');
+document.getElementById('btn_info').classList.toggle('active',currentCareer==='info');
+buildSidebar();
+buildLegend();
+buildGrid();
+render();
+</script>
+</body>
+</html>
