@@ -41,6 +41,17 @@
   }
   header h1 { font-size: 1.02rem; color: #dce8ff; font-weight: 700; }
   header span { font-size: 0.78rem; color: var(--muted); }
+  .version-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid #3d5c96;
+    background: #14233f;
+    color: #9dc0ff;
+    font-size: 0.72rem;
+    font-weight: 700;
+  }
 
   .career-bar {
     background: rgba(15, 23, 40, 0.9);
@@ -226,6 +237,7 @@
 <header>
   <button class="hamburger" onclick="toggleSidebar()" aria-label="Abrir materias">☰</button>
   <h1>Planificador de Horario — FICH UNL · 1er Cuatrimestre 2026</h1>
+  <div class="version-badge">v2 · horarios actualizados</div>
   <span id="selectedCount">0 comisiones seleccionadas</span>
 </header>
 
