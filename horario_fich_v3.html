@@ -237,7 +237,7 @@
 <header>
   <button class="hamburger" onclick="toggleSidebar()" aria-label="Abrir materias">☰</button>
   <h1>Planificador de Horario — FICH UNL · 1er Cuatrimestre 2026</h1>
-  <div class="version-badge">v2 · horarios actualizados</div>
+  <div class="version-badge">v3 · horarios actualizados</div>
   <span id="selectedCount">0 comisiones seleccionadas</span>
 </header>
 
@@ -336,17 +336,16 @@ const CAREERS = {
     name: 'Ing. en Informática',
     subjects: [
       {id:'quimica',name:'Química General',code:'FICHIF003',color:'#e0c235',commissions:[
-        {id:'qui_c1',label:'C1',sessions:[{day:'Lunes',start:'09:00',end:'11:00',type:'Problemas',aula:'A determinar',cupo:120},{day:'Jueves',start:'19:00',end:'20:30',type:'Teoría',aula:'A determinar',cupo:120}]},
-        {id:'qui_c2',label:'C2',sessions:[{day:'Lunes',start:'09:00',end:'11:00',type:'Problemas',aula:'A determinar',cupo:120},{day:'Jueves',start:'19:00',end:'20:30',type:'Teoría',aula:'A determinar',cupo:120}]},
-        {id:'qui_c3',label:'C3',sessions:[{day:'Lunes',start:'13:00',end:'15:00',type:'Problemas',aula:'Aula 3.1 - FICH',cupo:100},{day:'Jueves',start:'19:00',end:'20:30',type:'Teoría',aula:'A determinar',cupo:100}]}
+        {id:'qui_c1',label:'C1',sessions:[{day:'Lunes',start:'09:00',end:'11:00',type:'Problemas',aula:'Aula a determinar - Edificio a determinar',cupo:120},{day:'Jueves',start:'19:00',end:'20:30',type:'Teoría',aula:'Aula a determinar - Edificio a determinar',cupo:120}]},
+        {id:'qui_c2',label:'C2',sessions:[{day:'Lunes',start:'13:00',end:'15:00',type:'Problemas',aula:'Aula 3.1 - FICH',cupo:100},{day:'Jueves',start:'19:00',end:'20:30',type:'Teoría',aula:'Aula a determinar - Edificio a determinar',cupo:100}]}
       ]},
       {id:'matbasica',name:'Matemática Básica',code:'FICHIRH01',color:'#e05599',commissions:[
-        {id:'mat_c1',label:'C1',sessions:[{day:'Lunes',start:'18:30',end:'21:30',type:'T/P',aula:'Aula 0.2 - FICH',cupo:50},{day:'Miércoles',start:'18:30',end:'21:30',type:'T/P',aula:'Aula 0.2 - FICH',cupo:50}]},
-        {id:'mat_c2',label:'C2',sessions:[{day:'Lunes',start:'18:00',end:'21:00',type:'T/P',aula:'Aula 0.3 - FICH',cupo:60},{day:'Jueves',start:'08:00',end:'11:00',type:'T/P',aula:'Aula Magna A',cupo:60}]},
-        {id:'mat_c3',label:'C3',sessions:[{day:'Martes',start:'08:30',end:'11:30',type:'T/P',aula:'A determinar',cupo:100},{day:'Viernes',start:'08:30',end:'11:30',type:'T/P',aula:'Aula 3.1 - FICH',cupo:100}]},
-        {id:'mat_c4',label:'C4',sessions:[{day:'Miércoles',start:'09:00',end:'12:00',type:'T/P',aula:'A determinar',cupo:60},{day:'Viernes',start:'09:00',end:'12:00',type:'T/P',aula:'Aula 6 - Cubo',cupo:60}]},
-        {id:'mat_c5',label:'C5',sessions:[{day:'Martes',start:'14:00',end:'17:00',type:'T/P',aula:'Lab Mec. Fluidos',cupo:60},{day:'Jueves',start:'14:00',end:'17:00',type:'T/P',aula:'Aula 7 - Cubo',cupo:60}]},
-        {id:'mat_c6',label:'C6',sessions:[{day:'Martes',start:'08:00',end:'11:00',type:'T/P',aula:'A determinar',cupo:60},{day:'Miércoles',start:'13:00',end:'16:00',type:'T/P',aula:'Aula 4 - Cubo',cupo:60}]}
+        {id:'mat_c1',label:'C1',sessions:[{day:'Lunes',start:'18:30',end:'21:30',type:'T/P',aula:'Aula 0.2, Aula 0.1 - FICH, FICH',cupo:50},{day:'Miércoles',start:'18:30',end:'21:30',type:'T/P',aula:'Aula 0.2 - FICH',cupo:50}]},
+        {id:'mat_c2',label:'C2',sessions:[{day:'Lunes',start:'11:00',end:'14:00',type:'T/P',aula:'Aula 0.3 - FICH',cupo:60},{day:'Jueves',start:'08:00',end:'11:00',type:'T/P',aula:'Aula Magna A - FICH',cupo:60}]},
+        {id:'mat_c3',label:'C3',sessions:[{day:'Martes',start:'08:30',end:'11:30',type:'T/P',aula:'Aula a determinar - Edificio a determinar',cupo:100},{day:'Viernes',start:'08:30',end:'11:30',type:'T/P',aula:'Aula 3.1 - FICH',cupo:100}]},
+        {id:'mat_c4',label:'C4',sessions:[{day:'Miércoles',start:'09:00',end:'12:00',type:'T/P',aula:'Aula a determinar - Edificio a determinar',cupo:60},{day:'Viernes',start:'09:00',end:'12:00',type:'T/P',aula:'Aula 6 - Cubo - Aulario Común',cupo:60}]},
+        {id:'mat_c5',label:'C5',sessions:[{day:'Martes',start:'13:00',end:'16:00',type:'T/P',aula:'Lab Mecánica Fluidos - Laboratorio de Hidraulica - Nave I',cupo:60},{day:'Jueves',start:'14:00',end:'17:00',type:'T/P',aula:'Aula 7 - Cubo - Aulario Común',cupo:60}]},
+        {id:'mat_c6',label:'C6',sessions:[{day:'Martes',start:'08:00',end:'11:00',type:'T/P',aula:'Aula a determinar - Edificio a determinar',cupo:60},{day:'Miércoles',start:'13:00',end:'16:00',type:'T/P',aula:'Aula 4 - Cubo - Aulario Común',cupo:60}]}
       ]},
       SHARED_INGLES,
       SHARED_PROG
